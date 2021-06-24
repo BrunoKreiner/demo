@@ -6,9 +6,12 @@ Created on Tue May 25 16:37:23 2021
 """
 
 import tkinter as tk
+import math
 
 class Test():
     def __init__(self):
+        
+        self.constants = []
         
         self.formula = 0
         
@@ -74,7 +77,12 @@ class Test():
         self.root.mainloop()
     
         
+    
+    #Die Daten werden noch nicht validiert. Man geht davon aus, dass sie schon stimmen. (z.B. Zahlen (integer) für Alter)    
+    
     def getvals(self):
+        
+        #first go through tree to find out to which cathegory it corresponds
         category = self.tree(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(self.pbf_value.get()), float(0), float(1), float(0), float(0))
         print(category)
         if category == 0.0:
@@ -84,170 +92,171 @@ class Test():
         else:
             regression_value =  self.regression_3(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(1), float(self.pbf_value.get()))
         
-        self.premium_value.set(str(regression_value) + '.-')       
+        self.premium_value.set(str(math.exp(regression_value)) + '.-')       
 
+
+    #regression constants
+    #noch mit np.exp hochrechnen
     def regression_1(self, age, bmi, children, smoker, canton, pbf):
-        return age * 84.57060902 + bmi * 338.30444212 + children * 80.96289322 + smoker * -3499.11480535 + canton * 242.9672478 + pbf * 140.52510273 - 3039.947639067678
+        return age * 0.0197335 + bmi * 0.04229305 + children * 0.02384909 + smoker * 0.75578564 + canton * 0.05891112 + pbf * 0.01592228 + 5.832231201928893
     def regression_2(self, age, bmi, children, smoker, canton, pbf):
-        return age * 380.98262826 + bmi * 1718.48155744 + children * 767.38693392 + smoker * -12472.71629991 + canton * 807.30743223 + pbf * 393.0261260 - 37942.867484692986
+        return age * 0.02337388 + bmi * 0.07328484 + children * 0.02346498 + smoker * 0.83783636 + canton * 0.06517308 + pbf * 0.00268351 + 5.3945574155077445
     def regression_3(self, age, bmi, children, smoker, canton, pbf):
-        return age * -15.10083895 + bmi * 32.20836642 + children * 28.72929982 + smoker * 0 + canton * 24.55440541 + pbf * -98.29914818 + 41292.965416450555
+        return age * 8.94147230e-03 + bmi * 3.14761320e-02 + children * -2.00021533e-02 + smoker * 9.00832022e-18 + canton * 2.25844367e-02 + pbf * -2.80172846e-04 + 8.94780119237268
 
     
+
+    #decision tree code from main notebook
     def tree(self, age, bmi, children, smoker, pbf, so, ag, bs, bl):
-      if bmi <= 31.234000205993652:
+      if bmi <= 29.098000526428223:
         if smoker <= 0.5:
-          if age <= 63.5:
-            if bmi <= 31.046000480651855:
-              if age <= 57.5:
-                return 1.000000000;
-              else:  # if age > 57.5
-                if bmi <= 28.657999992370605:
-                  return 1.000000000;
-                else:  # if bmi > 28.657999992370605
-                  if bs <= 0.5:
-                    return 1.000000000;
-                  else:  # if bs > 0.5
-                    if pbf <= 44.69999885559082:
-                      return 0.000000000;
-                    else:  # if pbf > 44.69999885559082
-                      return 1.000000000;
-            else:  # if bmi > 31.046000480651855
-              if children <= 2.5:
-                return 1.000000000;
-              else:  # if children > 2.5
-                return 0.000000000;
-          else:  # if age > 63.5
-            if bmi <= 28.31599998474121:
+          if pbf <= 44.739999771118164:
+            return 1.000000000;
+          else:  # if pbf > 44.739999771118164
+            if age <= 53.0:
               return 1.000000000;
-            else:  # if bmi > 28.31599998474121
-              if bmi <= 30.588000297546387:
-                return 0.000000000;
-              else:  # if bmi > 30.588000297546387
-                return 1.000000000;
+            else:  # if age > 53.0
+              return 0.000000000;
         else:  # if smoker > 0.5
-          if age <= 53.5:
-            if bmi <= 27.82200050354004:
-              if age <= 40.5:
-                if pbf <= 39.85499954223633:
+          if age <= 54.5:
+            if age <= 33.5:
+              return 1.000000000;
+            else:  # if age > 33.5
+              if bmi <= 26.564000129699707:
+                if bs <= 0.5:
                   return 1.000000000;
-                else:  # if pbf > 39.85499954223633
-                  if bs <= 0.5:
+                else:  # if bs > 0.5
+                  if pbf <= 34.045000076293945:
+                    if children <= 2.5:
+                      return 1.000000000;
+                    else:  # if children > 2.5
+                      if pbf <= 19.690000534057617:
+                        return 1.000000000;
+                      else:  # if pbf > 19.690000534057617
+                        return 0.000000000;
+                  else:  # if pbf > 34.045000076293945
+                    return 0.000000000;
+              else:  # if bmi > 26.564000129699707
+                if children <= 0.5:
+                  if pbf <= 23.22499942779541:
                     return 1.000000000;
-                  else:  # if bs > 0.5
+                  else:  # if pbf > 23.22499942779541
                     return 0.000000000;
-              else:  # if age > 40.5
-                if bmi <= 23.604000091552734:
-                  return 1.000000000;
-                else:  # if bmi > 23.604000091552734
-                  if bmi <= 26.741999626159668:
-                    if bs <= 0.5:
-                      if children <= 2.0:
-                        return 1.000000000;
-                      else:  # if children > 2.0
-                        return 0.000000000;
-                    else:  # if bs > 0.5
-                      if bmi <= 25.010000228881836:
-                        return 0.000000000;
-                      else:  # if bmi > 25.010000228881836
-                        return 1.000000000;
-                  else:  # if bmi > 26.741999626159668
-                    return 0.000000000;
-            else:  # if bmi > 27.82200050354004
-              if age <= 29.5:
-                return 1.000000000;
-              else:  # if age > 29.5
-                return 0.000000000;
-          else:  # if age > 53.5
+                else:  # if children > 0.5
+                  return 0.000000000;
+          else:  # if age > 54.5
             if pbf <= 9.980000019073486:
               return 1.000000000;
             else:  # if pbf > 9.980000019073486
               return 0.000000000;
-      else:  # if bmi > 31.234000205993652
-        if age <= 35.5:
-          if smoker <= 0.5:
-            if pbf <= 58.7400016784668:
+      else:  # if bmi > 29.098000526428223
+        if smoker <= 0.5:
+          if age <= 45.5:
+            if bmi <= 34.007999420166016:
               return 1.000000000;
-            else:  # if pbf > 58.7400016784668
-              if age <= 31.0:
+            else:  # if bmi > 34.007999420166016
+              if age <= 32.5:
                 return 1.000000000;
-              else:  # if age > 31.0
-                return 0.000000000;
-          else:  # if smoker > 0.5
-            if age <= 20.5:
-              if bmi <= 37.24800109863281:
-                return 1.000000000;
-              else:  # if bmi > 37.24800109863281
-                return 0.000000000;
-            else:  # if age > 20.5
-              return 0.000000000;
-        else:  # if age > 35.5
-          if bmi <= 33.06599998474121:
-            if age <= 59.5:
-              if smoker <= 0.5:
+              else:  # if age > 32.5
+                if bmi <= 36.736000061035156:
+                  if bs <= 0.5:
+                    if pbf <= 56.92499923706055:
+                      return 1.000000000;
+                    else:  # if pbf > 56.92499923706055
+                      return 0.000000000;
+                  else:  # if bs > 0.5
+                    return 0.000000000;
+                else:  # if bmi > 36.736000061035156
+                  return 0.000000000;
+          else:  # if age > 45.5
+            if bmi <= 33.06399917602539:
+              if age <= 59.5:
                 if bs <= 0.5:
                   if age <= 57.5:
                     return 1.000000000;
                   else:  # if age > 57.5
-                    if bmi <= 32.55999946594238:
+                    if bmi <= 31.848000526428223:
                       return 1.000000000;
-                    else:  # if bmi > 32.55999946594238
-                      return 0.000000000;
-                else:  # if bs > 0.5
-                  if age <= 50.0:
-                    return 1.000000000;
-                  else:  # if age > 50.0
-                    return 0.000000000;
-              else:  # if smoker > 0.5
-                if bs <= 0.5:
-                  return 0.000000000;
-                else:  # if bs > 0.5
-                  if bmi <= 31.736000061035156:
-                    return 0.000000000;
-                  else:  # if bmi > 31.736000061035156
-                    return 0.000000000;
-            else:  # if age > 59.5
-              if smoker <= 0.5:
-                return 0.000000000;
-              else:  # if smoker > 0.5
-                if pbf <= 40.915000915527344:
-                  return 0.000000000;
-                else:  # if pbf > 40.915000915527344
-                  return 0.000000000;
-          else:  # if bmi > 33.06599998474121
-            if smoker <= 0.5:
-              if pbf <= 35.635000228881836:
-                return 1.000000000;
-              else:  # if pbf > 35.635000228881836
-                if age <= 48.5:
-                  if pbf <= 41.84499931335449:
-                    if bs <= 0.5:
-                      return 1.000000000;
-                    else:  # if bs > 0.5
-                      return 0.000000000;
-                  else:  # if pbf > 41.84499931335449
-                    if children <= 0.5:
-                      return 1.000000000;
-                    else:  # if children > 0.5
-                      return 0.000000000;
-                else:  # if age > 48.5
-                  if bmi <= 34.1200008392334:
-                    if ag <= 0.5:
-                      return 0.000000000;
-                    else:  # if ag > 0.5
-                      if age <= 60.0:
-                        return 1.000000000;
-                      else:  # if age > 60.0
+                    else:  # if bmi > 31.848000526428223
+                      if pbf <= 32.204999923706055:
                         return 0.000000000;
-                  else:  # if bmi > 34.1200008392334
+                      else:  # if pbf > 32.204999923706055
+                        if age <= 58.5:
+                          return 0.000000000;
+                        else:  # if age > 58.5
+                          return 1.000000000;
+                else:  # if bs > 0.5
+                  if pbf <= 46.97999954223633:
+                    if bmi <= 31.77400016784668:
+                      if age <= 55.0:
+                        return 1.000000000;
+                      else:  # if age > 55.0
+                        if bmi <= 29.417999267578125:
+                          return 1.000000000;
+                        else:  # if bmi > 29.417999267578125
+                          return 0.000000000;
+                    else:  # if bmi > 31.77400016784668
+                      return 0.000000000;
+                  else:  # if pbf > 46.97999954223633
                     return 0.000000000;
-            else:  # if smoker > 0.5
-              if age <= 47.5:
-                if pbf <= 61.829999923706055:
+              else:  # if age > 59.5
+                if bmi <= 31.242000579833984:
+                  if pbf <= 48.295000076293945:
+                    if so <= 0.5:
+                      return 1.000000000;
+                    else:  # if so > 0.5
+                      if bmi <= 30.239999771118164:
+                        return 0.000000000;
+                      else:  # if bmi > 30.239999771118164
+                        return 1.000000000;
+                  else:  # if pbf > 48.295000076293945
+                    return 0.000000000;
+                else:  # if bmi > 31.242000579833984
                   return 0.000000000;
-                else:  # if pbf > 61.829999923706055
+            else:  # if bmi > 33.06399917602539
+              if bmi <= 34.579999923706055:
+                if age <= 55.0:
+                  if bmi <= 33.191999435424805:
+                    return 0.000000000;
+                  else:  # if bmi > 33.191999435424805
+                    if age <= 51.5:
+                      if so <= 0.5:
+                        return 1.000000000;
+                      else:  # if so > 0.5
+                        return 0.000000000;
+                    else:  # if age > 51.5
+                      return 1.000000000;
+                else:  # if age > 55.0
                   return 0.000000000;
-              else:  # if age > 47.5
+              else:  # if bmi > 34.579999923706055
                 return 0.000000000;
-
+        else:  # if smoker > 0.5
+          if age <= 30.5:
+            if age <= 22.5:
+              if bmi <= 37.24800109863281:
+                return 1.000000000;
+              else:  # if bmi > 37.24800109863281
+                return 0.000000000;
+            else:  # if age > 22.5
+              if pbf <= 30.84000015258789:
+                if age <= 29.5:
+                  return 1.000000000;
+                else:  # if age > 29.5
+                  if so <= 0.5:
+                    return 1.000000000;
+                  else:  # if so > 0.5
+                    return 0.000000000;
+              else:  # if pbf > 30.84000015258789
+                return 0.000000000;
+          else:  # if age > 30.5
+            if bmi <= 31.395999908447266:
+              return 0.000000000;
+            else:  # if bmi > 31.395999908447266
+              if age <= 49.0:
+                if bmi <= 36.097999572753906:
+                  return 0.000000000;
+                else:  # if bmi > 36.097999572753906
+                  return 0.000000000;
+              else:  # if age > 49.0
+                return 0.000000000;
 app=Test()
