@@ -17,6 +17,8 @@ class Test():
         
         self.root = tk.Tk()
         
+        self.options = ["SO","AG", "BS", "BL"]
+        
         self.title = tk.Label(self.root, text = "Premium Calculator", font = "ar 15 bold")
         self.title.place(anchor="center")
         self.title.grid(row = 0, column = 2)
@@ -30,6 +32,13 @@ class Test():
         self.premium_value.set(str(self.formula) + '.-')
         self.checkvalue = tk.IntVar()
         
+        self.clickedDrop = tk.StringVar()
+        
+        
+        
+        self.clickedDrop.set(self.options[0])
+        self.drop = tk.OptionMenu(self.root, self.clickedDrop, *self.options)
+        
         
         self.age = tk.Label(self.root, text = "Age")
         self.bmi = tk.Label(self.root, text = "BMI")
@@ -38,11 +47,10 @@ class Test():
         self.smoker = tk.Checkbutton(self.root, text = "Smoker", variable = self.smoker_value)
         self.premium = tk.Label(self.root, text = "Predicted Costs:")
         
-        self.canton = tk.Label(self.root, text = "Your Canton is Aargau!")
+        self.canton = tk.Label(self.root, text = "Canton:")
         
         self.checkbtn = tk.Checkbutton(text = "You agree with our Terms of Service", variable = self.checkvalue)
         self.checkbtn.grid(row = 7, column = 3)
-        
         
         self.age_entry = tk.Entry(self.root, textvariable = self.age_value)
         self.bmi_entry = tk.Entry(self.root, textvariable = self.bmi_value)
@@ -61,11 +69,13 @@ class Test():
         self.pbf.grid(row = 3, column = 2)
         self.children.grid(row = 4, column = 2)
         self.smoker.grid(row = 6, column = 3)
-        self.canton.grid(row = 5, column = 3)
+        self.canton.grid(row = 5, column = 2)
         self.premium.grid(row = 12, column = 2)
         
         self.premium_label = tk.Label(self.root, textvariable=self.premium_value)
         self.premium_label.grid(row = 12, column = 3)
+        
+        self.drop.grid(row = 5, column= 3)
 
         self.button = tk.Button(self.root,
                                 text="Predict Costs",
@@ -82,19 +92,31 @@ class Test():
     
     def getvals(self):
         
+        self.chooseCanton(self.clickedDrop.get())
+        
+        cantons_to_bool = []
+        
+        for i in self.options:
+            if(i == self.clickedDrop.get()):
+                cantons_to_bool.append(1)
+            else:
+                cantons_to_bool.append(0)
+        
         #first go through tree to find out to which cathegory it corresponds
-        category = self.tree(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(self.pbf_value.get()), float(0), float(1), float(0), float(0))
-        print(category)
+        category = self.tree(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(self.pbf_value.get()), [float(i) for i in cantons_to_bool])
         if category == 0.0:
-            regression_value = self.regression_1(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(1), float(self.pbf_value.get()))
+            regression_value = self.regression_1(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(self.options.index(self.clickedDrop.get())), float(self.pbf_value.get()))
         elif category == 1.0:
-            regression_value = self.regression_2(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(1), float(self.pbf_value.get()))
+            regression_value = self.regression_2(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(self.options.index(self.clickedDrop.get())), float(self.pbf_value.get()))
         else:
-            regression_value =  self.regression_3(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(1), float(self.pbf_value.get()))
+            regression_value =  self.regression_3(float(self.age_value.get()), float(self.bmi_value.get()), float(self.children_value.get()), float(self.smoker_value.get()), float(self.options.index(self.clickedDrop.get())), float(self.pbf_value.get()))
         
         self.premium_value.set(str(math.exp(regression_value)) + '.-')       
 
 
+    def chooseCanton(self, cantonValue):
+        pass
+    
     #regression constants
     #noch mit np.exp hochrechnen
     def regression_1(self, age, bmi, children, smoker, canton, pbf):
@@ -107,7 +129,13 @@ class Test():
     
 
     #decision tree code from main notebook
-    def tree(self, age, bmi, children, smoker, pbf, so, ag, bs, bl):
+    def tree(self, age, bmi, children, smoker, pbf, cantons):
+    
+      so = cantons[0]
+      ag = cantons[1]
+      bs = cantons[2]
+      bl = cantons[3]
+      
       if bmi <= 29.098000526428223:
         if smoker <= 0.5:
           if pbf <= 44.739999771118164:
