@@ -43,7 +43,7 @@ class Test():
         self.age = tk.Label(self.root, text = "Age")
         self.bmi = tk.Label(self.root, text = "BMI")
         self.pbf = tk.Label(self.root, text = "Body Fat Percentage")
-        self.children = tk.Label(self.root, text = "Amount of Children")
+        self.children = tk.Label(self.root, text = "Number of Children")
         self.smoker = tk.Checkbutton(self.root, text = "Smoker", variable = self.smoker_value)
         self.premium = tk.Label(self.root, text = "Predicted Costs:")
         
